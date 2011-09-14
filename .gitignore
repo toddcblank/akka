@@ -36,6 +36,7 @@ tm.out
 *.ipr
 *.iml
 run-codefellow
+.cache
 .project
 .settings
 .classpath
