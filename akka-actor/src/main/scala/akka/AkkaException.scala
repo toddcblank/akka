@@ -44,3 +44,7 @@ object AkkaException {
     case e: UnknownHostException ⇒ "unknown"
   }
 }
+
+trait NoStackTrace { self: Throwable ⇒
+  abstract override def fillInStackTrace = this
+}

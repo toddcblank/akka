@@ -17,7 +17,7 @@ import akka.japi.{ Creator, Procedure }
 import akka.serialization.{ Serializer, Serialization }
 import akka.event.EventHandler
 import akka.experimental
-import akka.AkkaException
+import akka.{ AkkaException, NoStackTrace }
 
 import scala.collection.immutable.Stack
 import scala.reflect.BeanProperty
@@ -108,7 +108,7 @@ class InvalidMessageException private[akka] (message: String, cause: Throwable =
 /**
  * This message is thrown by default when an Actors behavior doesn't match a message
  */
-case class UnhandledMessageException(msg: Any, ref: ActorRef = null) extends Exception {
+case class UnhandledMessageException(msg: Any, ref: ActorRef = null) extends Exception with NoStackTrace {
 
   def this(msg: String) = this(msg, null)
 
@@ -116,8 +116,6 @@ case class UnhandledMessageException(msg: Any, ref: ActorRef = null) extends Exc
   override def getMessage =
     if (ref ne null) "Actor %s does not handle [%s]".format(ref, msg)
     else "Actor does not handle [%s]".format(msg)
-
-  override def fillInStackTrace() = this //Don't waste cycles generating stack trace
 }
 
 /**
