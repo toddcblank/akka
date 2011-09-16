@@ -54,7 +54,7 @@ class ClientFSM extends Actor with LoggingFSM[ClientFSM.State, ClientFSM.Data] {
     case Event(msg: ClientOp, Data(channel, Left(msgs))) ⇒
       stay using Data(channel, Left(msg :: msgs))
     case Event(Connected, Data(channel, Left(msgs))) ⇒
-      val hello = Hello.newBuilder.setName(name).setHost(myself.getHostName).setPort(myself.getPort).build
+      val hello = Hello.newBuilder.setName(name).setHost(myself.getAddress.getHostAddress).setPort(myself.getPort).build
       channel.write(Wrapper.newBuilder.setHello(hello).build)
       msgs.reverse foreach sendMsg(channel)
       goto(Connected) using Data(channel, Left(Nil))
@@ -74,7 +74,7 @@ class ClientFSM extends Actor with LoggingFSM[ClientFSM.State, ClientFSM.Data] {
     case Event(msg: EnterBarrier, Data(channel, _)) ⇒
       sendMsg(channel)(msg)
       stay using Data(channel, Right((msg.name, self.channel)))
-    case Event(msg: Wrapper, Data(channel, Right((barrier, sender)))) ⇒
+    case Event(msg: Wrapper, Data(channel, Right((barrier, sender)))) if msg.getAllFields.size == 1 ⇒
       if (msg.hasBarrier) {
         val b = msg.getBarrier.getName
         if (b != barrier) {
