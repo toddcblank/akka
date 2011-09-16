@@ -68,10 +68,14 @@ class Index[K <: AnyRef, V <: AnyRef: Manifest] {
   /**
    * @return a _new_ array of all existing values for the given key at the time of the call
    */
-  def values(key: K): Array[V] = {
+  def values(key: K): Set[V] = {
+    import scala.collection.JavaConversions._
     val set: JSet[V] = container get key
-    val result = if (set ne null) set toArray Naught else Naught
-    result.asInstanceOf[Array[V]]
+    if (set ne null) {
+      set.toSet
+    } else {
+      Set()
+    }
   }
 
   /**
@@ -110,6 +114,20 @@ class Index[K <: AnyRef, V <: AnyRef: Manifest] {
         } else false //Remove failed
       }
     } else false //Remove failed
+  }
+
+  /**
+   * Remove the current mapping for the given key.
+   * @return a collection containing the previous mappings
+   */
+  def remove(key: K): Set[V] = {
+    import scala.collection.JavaConversions._
+    val previous = container.remove(key)
+    if (previous ne null) {
+      previous.toSet
+    } else {
+      Set()
+    }
   }
 
   /**
