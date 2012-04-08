@@ -148,7 +148,7 @@ object AkkaBuild extends Build {
     id = "akka-durable-mailboxes",
     base = file("akka-durable-mailboxes"),
     settings = parentSettings,
-    aggregate = Seq(mailboxesCommon, fileMailbox, mongoMailbox, redisMailbox, beanstalkMailbox, zookeeperMailbox)
+    aggregate = Seq(mailboxesCommon, fileMailbox, mongoMailbox, redisMailbox, beanstalkMailbox, zookeeperMailbox, rabbitMqMailbox)
   )
 
   lazy val mailboxesCommon = Project(
@@ -211,6 +211,14 @@ object AkkaBuild extends Build {
     )
   )
 
+  lazy val rabbitMqMailbox = Project(
+    id = "akka-rabbitmq-mailbox",
+    base = file("akka-durable-mailboxes/akka-rabbitmq-mailbox"),
+    dependencies = Seq(mailboxesCommon % "compile;test->test"),
+    settings = defaultSettings ++ Seq(
+      libraryDependencies ++= Dependencies.rabbitMqMailbox
+    )
+  )
 
   lazy val zeroMQ = Project(
     id = "akka-zeromq",
@@ -327,7 +335,7 @@ object AkkaBuild extends Build {
     id = "akka-docs",
     base = file("akka-docs"),
     dependencies = Seq(actor, testkit % "test->test", remote, cluster, slf4j, agent, transactor,
-        fileMailbox, mongoMailbox, redisMailbox, beanstalkMailbox, zookeeperMailbox, zeroMQ),
+        fileMailbox, mongoMailbox, redisMailbox, beanstalkMailbox, zookeeperMailbox, zeroMQ, rabbitMqMailbox),
     settings = defaultSettings ++ Seq(
       unmanagedSourceDirectories in Test <<= baseDirectory { _ ** "code" get },
       libraryDependencies ++= Dependencies.docs,
@@ -468,6 +476,8 @@ object Dependencies {
       </dependency>
     </dependencies>
   }
+
+  val rabbitMqMailbox = Seq(slf4jApi, rabbit, Test.junit)
 
   val zookeeperMailbox = Seq(zkClient, zookeeper, commonsIo, Test.junit)
 
