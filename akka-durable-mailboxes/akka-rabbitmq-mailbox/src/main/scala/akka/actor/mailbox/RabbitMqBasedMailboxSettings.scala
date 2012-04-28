@@ -3,7 +3,7 @@ package akka.actor.mailbox
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 
-class RabbitMqBaseMailboxSettings(val systemSettings: ActorSystem.Settings, val userConfig: Config)
+class RabbitMqBasedMailboxSettings(val systemSettings: ActorSystem.Settings, val userConfig: Config)
   extends DurableMailboxSettings {
 
   def name = "rabbitmq-based"
@@ -19,5 +19,8 @@ class RabbitMqBaseMailboxSettings(val systemSettings: ActorSystem.Settings, val 
   val durable = getBoolean("durable")
   val autoDelete = getBoolean("autoDelete")
   val queuePrefix = getString("queuePrefix")
+  val maxConnections = getInt("maxConnections")
 
+  //There's probably a better place to instantiate this, but it works for now.
+  object channelPool extends RabbitMqChannelPool(RabbitMqBasedMailboxSettings.this);
 }
