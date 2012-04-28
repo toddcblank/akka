@@ -11,7 +11,8 @@ import com.rabbitmq.client.{ Channel, AMQP, ConnectionFactory }
  * A naive rabbit mq based durable mailbox.  It uses a per-actor queue.  It is possible
  * that the actor could crash after consuming a message.
  *
- * TODO - Integrate better connection handling
+ * It uses a single channel per actor, multiplexed over a fixed number of connections
+ * to RabbitMQ
  *
  * @param systemSettings
  * @param config
